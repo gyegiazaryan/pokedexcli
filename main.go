@@ -29,10 +29,10 @@ func main() {
 			callback:    commandExit,
 		},
 	}
+	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
 		fmt.Print("Pokedex > ")
-		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 		input := scanner.Text()
 		//cleaned := cleanInput(input)
