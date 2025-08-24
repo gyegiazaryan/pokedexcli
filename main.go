@@ -44,11 +44,17 @@ func main() {
 		"map": {
 			name:        "map",
 			description: "prints a list of map locations",
-			callback:    commandMap},
+			callback:    commandMap,
+		},
 		"mapb": {
 			name:        "mapb",
 			description: "prints the previous list of map locations",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "explore a location area in detail",
+			callback:    commandExplore,
 		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
@@ -67,8 +73,9 @@ func main() {
 			commands["map"].callback(&cfg)
 		case "mapb":
 			commands["mapb"].callback(&cfg)
+		case "explore":
+			commands["explore"].callback(&cfg)
 		}
-
 	}
 
 }
@@ -124,6 +131,25 @@ func commandMapb(cfg *config) error {
 	cfg.previousLocationAreaURL = result.Previous
 	return nil
 }
+
+func commandExplore(cfg *config) error {
+	//TODO: make this a user input
+	location := "canalave-city-area"
+	client := cfg.pokeapiClient
+
+	result, err := client.GetLocationAreaDetails(location)
+	if err != nil {
+		return fmt.Errorf("error fetching location areas: %w", err)
+	}
+
+	fmt.Printf("Exploring %s\n", result.Name)
+	fmt.Println("Found Pokemon:")
+	for _, v := range result.PokemonEncounters {
+		fmt.Printf(" - %s\n", v.Pokemon.Name)
+	}
+	return nil
+}
+
 func cleanInput(text string) []string {
 	trimmed := strings.TrimSpace(text)
 

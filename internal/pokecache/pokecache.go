@@ -1,8 +1,11 @@
 package pokecache
 
-import "time"
+import (
+	"time"
+)
 
 type Cache struct {
+	//mutex sync.Mutex
 	cache map[string]cacheEntry
 }
 
@@ -21,6 +24,8 @@ func NewCache(interval time.Duration) Cache {
 }
 
 func (c *Cache) Add(key string, val []byte) {
+	//c.mutex.Lock()
+	//defer c.mutex.Unlock()
 	c.cache[key] = cacheEntry{
 		createdAt: time.Now().UTC(),
 		val:       val,
@@ -32,7 +37,7 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, ok
 }
 
-// deletes cache records that are older than delete threshold?
+// deletes any cache records that are older than delete interval
 func (c *Cache) PurgeCache(deleteInterval time.Duration) {
 	deleteThreshold := time.Now().UTC().Add(-deleteInterval)
 	for key, v := range c.cache {
