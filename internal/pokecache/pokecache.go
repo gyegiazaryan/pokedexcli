@@ -11,10 +11,13 @@ type cacheEntry struct {
 	val       []byte
 }
 
-func NewCache() Cache {
-	return Cache{
+func NewCache(interval time.Duration) Cache {
+	c := Cache{
 		cache: make(map[string]cacheEntry),
 	}
+	//performing the purging in a seperate thread or else the code gets stuck here.
+	go c.purgeLoop(interval)
+	return c
 }
 
 func (c *Cache) Add(key string, val []byte) {
@@ -29,18 +32,19 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, ok
 }
 
-func (c *Cache) reap(interval time.Duration) {
-	timeAgo := time.Now().UTC().Add(-interval)
+// deletes cache records that are older than delete threshold?
+func (c *Cache) PurgeCache(deleteInterval time.Duration) {
+	deleteThreshold := time.Now().UTC().Add(-deleteInterval)
 	for key, v := range c.cache {
-		if v.createdAt.Before(timeAgo) {
+		if v.createdAt.Before(deleteThreshold) {
 			delete(c.cache, key)
 		}
 	}
 }
 
-func (c *Cache) reapLoop(interval time.Duration) {
+func (c *Cache) purgeLoop(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
-		c.reap(interval)
+		c.PurgeCache(interval)
 	}
 }

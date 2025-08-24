@@ -15,6 +15,21 @@ func (c *Client) GetLocationAreas(pageURL *string) (LocationAreaResponse, error)
 		url = *pageURL
 	}
 
+	//check cache here
+	data, ok := c.cache.Get(url)
+	if ok {
+		//cache hit
+		fmt.Println("Cache hit!")
+		response := LocationAreaResponse{}
+		err := json.Unmarshal(data, &response)
+		if err != nil {
+			return LocationAreaResponse{}, err
+		}
+
+		return response, nil
+	}
+	fmt.Println("Cache miss!")
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return LocationAreaResponse{}, err
@@ -29,7 +44,7 @@ func (c *Client) GetLocationAreas(pageURL *string) (LocationAreaResponse, error)
 		return LocationAreaResponse{}, fmt.Errorf("bad status: %v", resp.StatusCode)
 	}
 
-	data, err := io.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return LocationAreaResponse{}, err
 	}
@@ -39,6 +54,9 @@ func (c *Client) GetLocationAreas(pageURL *string) (LocationAreaResponse, error)
 	if err != nil {
 		return LocationAreaResponse{}, err
 	}
+
+	//add the results to the cache
+	c.cache.Add(url, data)
 
 	return response, nil
 

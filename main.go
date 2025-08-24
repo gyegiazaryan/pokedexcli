@@ -8,6 +8,7 @@ import (
 	"os"
 	"pokedexcli/internal/pokeapi"
 	"strings"
+	"time"
 )
 
 type cliCommand struct {
@@ -26,7 +27,7 @@ var commands = map[string]cliCommand{}
 
 func main() {
 	cfg := config{
-		pokeapiClient: pokeapi.NewClient(),
+		pokeapiClient: pokeapi.NewClient(time.Hour),
 	}
 
 	commands = map[string]cliCommand{
