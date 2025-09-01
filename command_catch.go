@@ -11,10 +11,9 @@ func commandCatch(cfg *config, args ...string) error {
 	if len(args) != 1 {
 		return errors.New("please provide a pokemon to catch")
 	}
-
-	fmt.Println("Throwing a Pokeball at pikachu...")
-
 	pokemonName := args[0]
+
+	fmt.Printf("Throwing a Pokeball at %s... \n", pokemonName)
 
 	client := cfg.pokeapiClient
 
@@ -31,6 +30,7 @@ func commandCatch(cfg *config, args ...string) error {
 	fmt.Printf("You caught %s ! \n", result.Name)
 
 	cfg.Pokedex[pokemonName] = result
+	fmt.Println("You may now inspect it with the inspect command.")
 
 	return nil
 }
