@@ -19,12 +19,14 @@ type config struct {
 	pokeapiClient           pokeapi.Client
 	nextLocationAreaURL     *string
 	previousLocationAreaURL *string
+	Pokedex                 map[string]pokeapi.PokemonResponse
 }
 
 func startRepl() {
 
 	cfg := config{
 		pokeapiClient: pokeapi.NewClient(time.Hour),
+		Pokedex:       make(map[string]pokeapi.PokemonResponse),
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -82,6 +84,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore {location_area}",
 			description: "explore a location area in detail",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch {pokemon name}",
+			description: "catch a pokemon and add it to your pokedex",
+			callback:    commandCatch,
 		},
 	}
 
